@@ -17,5 +17,8 @@
     <sql id="Base_Column_List">
         id, name, label, parentid, is_show, orderby, is_leaf
     </sql>
+    <select id="selectTreeNodes" resultType="com.lartimes.content.model.dto.CourseCategoryTreeDto">
+        select   * from  course_category
+    </select>
 
 </mapper>
