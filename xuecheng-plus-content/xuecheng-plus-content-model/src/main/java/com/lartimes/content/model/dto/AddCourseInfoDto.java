@@ -1,6 +1,5 @@
 package com.lartimes.content.model.dto;
 
-import com.lartimes.content.exception.ValidationGroups;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.Size;
@@ -18,17 +17,17 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class AddCourseInfoDto {
+
     @NotEmpty(message = "课程名称不能为空")
     @Schema(name = "课程名称", requiredMode = Schema.RequiredMode.REQUIRED)
     private String name;
 
-    @NotEmpty(message = "适用人群不能为空" , groups = ValidationGroups.Insert.class)
-    @NotEmpty(message = "适用人群不能为空" , groups = ValidationGroups.Update.class)
-    @Size(message = "适用人群内容过少",min = 10)
+    @NotEmpty(message = "适用人群不能为空")
+    @Size(message = "适用人群内容过少", min = 10)
     @Schema(name = "适用人群", requiredMode = Schema.RequiredMode.REQUIRED)
     private String users;
 
-    @NotEmpty(groups = ValidationGroups.Update.class)
+    @NotEmpty()
     @Schema(name = "课程标签", requiredMode = Schema.RequiredMode.REQUIRED)
     private String tags;
 
@@ -60,18 +59,18 @@ public class AddCourseInfoDto {
 
     @Schema(name = "价格")
     private Float price;
-    @Schema(name= "原价")
+    @Schema(name = "原价")
     private Float originalPrice;
 
 
-    @Schema(name= "qq")
+    @Schema(name = "qq")
     private String qq;
 
-    @Schema(name= "微信")
+    @Schema(name = "微信")
     private String wechat;
-    @Schema(name= "电话")
+    @Schema(name = "电话")
     private String phone;
 
-    @Schema(name= "有效期")
+    @Schema(name = "有效期")
     private Integer validDays;
 }
