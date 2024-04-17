@@ -28,4 +28,6 @@ public interface CourseBaseInfoService {
 
     CourseBaseInfoDto updateCourse(Long companyId , EditCourseDto editCourseDto);
 
+    void deleteCourse(Long id);
+
 }

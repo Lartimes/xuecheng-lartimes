@@ -1,25 +1,33 @@
-server:
-  servlet:
-    context-path: /content
-  port: 63040
-
-
-
-
 #微服务配置
 spring:
   application:
     name: content-api
-  datasource:
-    driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://aliyun:3306/xc_content?serverTimezone=UTC&userUnicode=true&useSSL=false
-    username: root
-    password: 307314
+  #  nacos
+  cloud:
+    nacos:
+      discovery:
+        server-addr: 172.22.0.71:8848
+        username: nacos
+        password: nacos
+        group: xuecheng-plus-project
+        namespace: 9162b69e-eadc-4f8a-b98c-c674f025b14a #Dev
+      config:
+        namespace: 9162b69e-eadc-4f8a-b98c-c674f025b14a #Dev
+        group: xuecheng-plus-project
+        file-extension: yaml
+        refresh-enabled: true
+        shared-configs:
+          - data-id: logging-${spring.profiles.active}.yaml
+            group: xuecheng-plus-common
+            refresh: true
+        extension-configs:
+          - data-id: ${spring.application.name}-${spring.profiles.active}.${spring.cloud.nacos.config.file-extension}
+            group: xuecheng-plus-common
+            refresh: true
+        username: nacos
+        password: nacos
+        enabled: true
+        server-addr: 172.22.0.71:8848
+  profiles:
+    active: dev
 
-
-# 日志文件配置路径
-logging:
-  config:
-    classpath: log4j2-dev.xml
-springdoc:
-  packages-to-scan: com.lartimes.content.controller

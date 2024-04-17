@@ -6,6 +6,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import org.springframework.beans.BeanUtils;
 
 import java.util.List;
 
@@ -20,6 +21,14 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 public class TeachPlanTreeDto extends Teachplan {
+
     private TeachplanMedia teachplanMedia;
     private List<TeachPlanTreeDto> teachPlanTreeNodes;
+
+    public static TeachPlanTreeDto cast(Teachplan teachplan) {
+        TeachPlanTreeDto teachPlanTreeDto = new TeachPlanTreeDto();
+        BeanUtils.copyProperties(teachplan , teachPlanTreeDto);
+        teachplan = null;
+        return teachPlanTreeDto;
+    }
 }

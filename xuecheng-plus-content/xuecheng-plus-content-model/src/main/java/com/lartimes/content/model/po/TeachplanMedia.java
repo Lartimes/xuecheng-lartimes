@@ -2,6 +2,8 @@ package com.lartimes.content.model.po;
 
 import com.baomidou.mybatisplus.annotation.*;
 import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
@@ -15,6 +17,8 @@ import java.time.LocalDateTime;
  */
 @Data
 @TableName("teachplan_media")
+@Setter
+@Getter
 public class TeachplanMedia implements Serializable {
 
     private static final long serialVersionUID = 1L;

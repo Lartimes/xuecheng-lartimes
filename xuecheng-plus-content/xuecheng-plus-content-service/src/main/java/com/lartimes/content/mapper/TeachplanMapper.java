@@ -1,8 +1,11 @@
 package com.lartimes.content.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import com.lartimes.content.model.dto.TeachPlanTreeDto;
 import com.lartimes.content.model.po.Teachplan;
 import org.apache.ibatis.annotations.Mapper;
+
+import java.util.List;
 
 /**
  * <p>
@@ -13,5 +16,11 @@ import org.apache.ibatis.annotations.Mapper;
  */
 @Mapper
 public interface TeachplanMapper extends BaseMapper<Teachplan> {
+
+    List<TeachPlanTreeDto> selectAllCourses(Long id);
+
+    Integer getMaxOrder(Teachplan teachplan);
+
+
 
 }

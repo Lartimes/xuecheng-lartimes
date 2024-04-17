@@ -18,6 +18,8 @@ class TeachPlanServiceImplTest {
     TeachPlanService teachPlanService;
     @Test
     void getTeachPlansTree() {
-//        teachPlanService.getTeachPlansTree();
+        System.out.println(teachPlanService.getPlanTree(1L));
     }
+
+
 }

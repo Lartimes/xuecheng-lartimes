@@ -15,11 +15,13 @@ import com.lartimes.content.model.dto.QueryCourseParamsDto;
 import com.lartimes.content.model.po.CourseBase;
 import com.lartimes.content.model.po.CourseMarket;
 import com.lartimes.content.service.CourseBaseInfoService;
+import com.lartimes.content.service.TeachPlanService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 /**
@@ -35,12 +37,14 @@ public class CourseBaseInfoServiceImpl implements CourseBaseInfoService {
     private final CourseMarketMapper courseMarketMapper;
 
     private final CourseBaseMapper courseBaseMapper;
+    private final TeachPlanService teachPlanService;
 
-    public CourseBaseInfoServiceImpl(CourseBaseMapper courseBaseMapper, CourseMarketMapper courseMarketMapper) {
+
+    public CourseBaseInfoServiceImpl(CourseBaseMapper courseBaseMapper, CourseMarketMapper courseMarketMapper, TeachPlanService teachPlanService) {
         this.courseBaseMapper = courseBaseMapper;
         this.courseMarketMapper = courseMarketMapper;
+        this.teachPlanService = teachPlanService;
     }
-
 
     /***
      * 1.写出参数
@@ -84,7 +88,9 @@ public class CourseBaseInfoServiceImpl implements CourseBaseInfoService {
         BeanUtils.copyProperties(addCourseInfoDto, baseInfoNew);
 //        TODO company_id audit_status 后续数据字典redis 进行更改
         baseInfoNew.setCompanyId(1232141425L);
-        baseInfoNew.setAuditStatus("202004");
+        baseInfoNew.setAuditStatus("202001");
+        baseInfoNew.setCreateDate(LocalDateTime.now());
+        baseInfoDtoNew.setStatus("203001");
         int count = courseBaseMapper.insert(baseInfoNew);
         if (count < 1) {
             throw new XueChengPlusException("插入基本课程Error");
@@ -113,11 +119,12 @@ public class CourseBaseInfoServiceImpl implements CourseBaseInfoService {
         LambdaQueryWrapper<CourseMarket> queryMarket = new LambdaQueryWrapper<>();
         queryMarket.eq(StringUtils.isNotBlank(id), CourseMarket::getId, id);
         CourseMarket courseMarket = courseMarketMapper.selectOne(queryMarket);
-        BeanUtils.copyProperties(courseMarket, returnDto);
+        if (courseMarket != null) {
+            BeanUtils.copyProperties(courseMarket, returnDto);
+        }
         BeanUtils.copyProperties(course, returnDto);
         return returnDto;
     }
-
 
     @Transactional
     @Override
@@ -140,5 +147,18 @@ public class CourseBaseInfoServiceImpl implements CourseBaseInfoService {
             throw new XueChengPlusException("更新失败");
         }
         return this.selectCourseById(String.valueOf(editCourseDto.getId()));
+    }
+
+    @Transactional
+    @Override
+    public void deleteCourse(Long id) {
+        CourseBase courseBase = courseBaseMapper.selectById(id);
+        if ("202001".equals(courseBase.getAuditStatus())) {
+            return;
+        }
+        teachPlanService.deletePlansByCourseId(id);
+        teachPlanService.deleteTeacher(id , null);
+        courseMarketMapper.deleteById(id);
+        courseBaseMapper.deleteById(id);
     }
 }

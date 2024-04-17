@@ -51,11 +51,16 @@ public class CourseBaseInfoController {
         return courseBaseInfoService.addCourse(courseInfoDto);
     }
 
+    @Operation(summary = "删除课程")
+    @DeleteMapping("/course/{id}")
+    public void deleteCourse(@PathVariable("id") Long id ){
+        courseBaseInfoService.deleteCourse(id);
+    }
+
     @Operation(summary = "查询接口", description = "对内容进行分页查询")
     @PostMapping("/course/list")
     @Parameters({@Parameter(name = "QueryCourseParamsDto")})
     public PageResult<CourseBase> toDo(PageParams params, @RequestBody(required = false) QueryCourseParamsDto courseParamsDto) {
-
         return courseBaseInfoService.getContentsByPage(params, courseParamsDto);
     }
 }

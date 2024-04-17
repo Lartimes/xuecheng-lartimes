@@ -19,7 +19,7 @@ public class MediaCodeGenerator {
 	private static final String SERVICE_NAME = "media";
 
 	private static final String DATA_SOURCE_USER_NAME  = "root";
-	private static final String DATA_SOURCE_PASSWORD  = "mysql";
+	private static final String DATA_SOURCE_PASSWORD  = "307314";
 	private static final String[] TABLE_NAMES = new String[]{
 			"media_files",
 			"media_process",
@@ -31,7 +31,7 @@ public class MediaCodeGenerator {
 
 	// TODO 默认生成entity，需要生成DTO修改此变量
 	// 一般情况下要先生成 DTO类 然后修改此参数再生成 PO 类。
-	private static final Boolean IS_DTO = false;
+	private static final Boolean IS_DTO = true;
 
 	public static void main(String[] args) {
 		// 代码生成器
@@ -58,7 +58,7 @@ public class MediaCodeGenerator {
 		// 数据库配置
 		DataSourceConfig dsc = new DataSourceConfig();
 		dsc.setDbType(DbType.MYSQL);
-		dsc.setUrl("jdbc:mysql://192.168.101.65:3306/xcplus_media"
+		dsc.setUrl("jdbc:mysql://aliyun:3306/xc_media"
 				+ "?useUnicode=true&useSSL=false&characterEncoding=utf8");
 		dsc.setDriverName("com.mysql.cj.jdbc.Driver");
 		dsc.setUsername(DATA_SOURCE_USER_NAME);
@@ -68,8 +68,7 @@ public class MediaCodeGenerator {
 		// 包配置
 		PackageConfig pc = new PackageConfig();
 		pc.setModuleName(SERVICE_NAME);
-		pc.setParent("com.xuecheng");
-
+		pc.setParent("com.lartimes");
 		pc.setServiceImpl("service.impl");
 		pc.setXml("mapper");
 		pc.setEntity("model.po");

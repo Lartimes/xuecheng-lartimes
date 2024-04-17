@@ -30,7 +30,6 @@ public class DictionaryController  {
     @Operation(summary = "queryAll数据字典" ,description = "查询所有数据字典")
     @GetMapping("/dictionary/all")
     public List<Dictionary> queryAll() {
-        System.out.println("-===================");
         return dictionaryService.queryAll();
     }
 
