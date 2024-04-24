@@ -55,7 +55,7 @@ public class MediaProcessServiceImpl extends ServiceImpl<MediaProcessMapper, Med
 //                进行格式转换，
 //                TODO 明天写
 //                Mp4VideoUtil videoUtil = new Mp4VideoUtil(null , video_path,mp4_name,mp4_path);
-                //开始视频转换，成功将返回success
+//                开始视频转换，成功将返回success
 //                String s = videoUtil.generateMp4();
 //                System.out.println(s);
 //                进行上传
