@@ -1,6 +1,6 @@
 package com.lartimes.media.service;
 
-import com.lartimes.media.model.po.MediaProcessDTO;
+import com.lartimes.media.model.po.MediaProcess;
 import com.baomidou.mybatisplus.extension.service.IService;
 
 /**
@@ -9,8 +9,8 @@ import com.baomidou.mybatisplus.extension.service.IService;
  * </p>
  *
  * @author itcast
- * @since 2024-04-17
+ * @since 2024-04-18
  */
-public interface MediaProcessService extends IService<MediaProcessDTO> {
+public interface MediaProcessService extends IService<MediaProcess> {
 
 }

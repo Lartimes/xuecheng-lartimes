@@ -1,6 +1,6 @@
 package com.lartimes.media.service.impl;
 
-import com.lartimes.media.model.po.MqMessageDTO;
+import com.lartimes.media.model.po.MqMessage;
 import com.lartimes.media.mapper.MqMessageMapper;
 import com.lartimes.media.service.MqMessageService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
@@ -18,6 +18,6 @@ import org.springframework.beans.factory.annotation.Autowired;
  */
 @Slf4j
 @Service
-public class MqMessageServiceImpl extends ServiceImpl<MqMessageMapper, MqMessageDTO> implements MqMessageService {
+public class MqMessageServiceImpl extends ServiceImpl<MqMessageMapper, MqMessage> implements MqMessageService {
 
 }

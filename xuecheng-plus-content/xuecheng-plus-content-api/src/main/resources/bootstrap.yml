@@ -6,7 +6,7 @@ spring:
   cloud:
     nacos:
       discovery:
-        server-addr: 172.22.0.71:8848
+        server-addr: localhost:8848
         username: nacos
         password: nacos
         group: xuecheng-plus-project
@@ -22,12 +22,12 @@ spring:
             refresh: true
         extension-configs:
           - data-id: ${spring.application.name}-${spring.profiles.active}.${spring.cloud.nacos.config.file-extension}
-            group: xuecheng-plus-common
+            group: xuecheng-plus-project
             refresh: true
         username: nacos
         password: nacos
         enabled: true
-        server-addr: 172.22.0.71:8848
+        server-addr: localhost:8848
   profiles:
     active: dev
 

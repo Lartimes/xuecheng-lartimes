@@ -1,6 +1,6 @@
 package com.lartimes.media.service;
 
-import com.lartimes.media.model.po.MediaFilesDTO;
+import com.lartimes.media.model.po.MediaFiles;
 import com.baomidou.mybatisplus.extension.service.IService;
 
 /**
@@ -9,8 +9,8 @@ import com.baomidou.mybatisplus.extension.service.IService;
  * </p>
  *
  * @author itcast
- * @since 2024-04-17
+ * @since 2024-04-18
  */
-public interface MediaFilesService extends IService<MediaFilesDTO> {
+public interface MediaFilesService extends IService<MediaFiles> {
 
 }

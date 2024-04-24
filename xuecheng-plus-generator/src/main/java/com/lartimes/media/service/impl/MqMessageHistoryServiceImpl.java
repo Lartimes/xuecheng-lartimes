@@ -1,6 +1,6 @@
 package com.lartimes.media.service.impl;
 
-import com.lartimes.media.model.po.MqMessageHistoryDTO;
+import com.lartimes.media.model.po.MqMessageHistory;
 import com.lartimes.media.mapper.MqMessageHistoryMapper;
 import com.lartimes.media.service.MqMessageHistoryService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
@@ -18,6 +18,6 @@ import org.springframework.beans.factory.annotation.Autowired;
  */
 @Slf4j
 @Service
-public class MqMessageHistoryServiceImpl extends ServiceImpl<MqMessageHistoryMapper, MqMessageHistoryDTO> implements MqMessageHistoryService {
+public class MqMessageHistoryServiceImpl extends ServiceImpl<MqMessageHistoryMapper, MqMessageHistory> implements MqMessageHistoryService {
 
 }

@@ -1,6 +1,6 @@
 package com.lartimes.media.service.impl;
 
-import com.lartimes.media.model.po.MediaFilesDTO;
+import com.lartimes.media.model.po.MediaFiles;
 import com.lartimes.media.mapper.MediaFilesMapper;
 import com.lartimes.media.service.MediaFilesService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
@@ -18,6 +18,6 @@ import org.springframework.beans.factory.annotation.Autowired;
  */
 @Slf4j
 @Service
-public class MediaFilesServiceImpl extends ServiceImpl<MediaFilesMapper, MediaFilesDTO> implements MediaFilesService {
+public class MediaFilesServiceImpl extends ServiceImpl<MediaFilesMapper, MediaFiles> implements MediaFilesService {
 
 }

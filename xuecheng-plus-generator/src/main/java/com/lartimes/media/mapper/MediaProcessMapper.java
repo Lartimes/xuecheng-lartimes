@@ -1,6 +1,6 @@
 package com.lartimes.media.mapper;
 
-import com.lartimes.media.model.po.MediaProcessDTO;
+import com.lartimes.media.model.po.MediaProcess;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import org.springframework.stereotype.Repository;
 
@@ -11,6 +11,6 @@ import org.springframework.stereotype.Repository;
  *
  * @author itcast
  */
-public interface MediaProcessMapper extends BaseMapper<MediaProcessDTO> {
+public interface MediaProcessMapper extends BaseMapper<MediaProcess> {
 
 }

@@ -1,6 +1,6 @@
 package com.lartimes.media.mapper;
 
-import com.lartimes.media.model.po.MqMessageDTO;
+import com.lartimes.media.model.po.MqMessage;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import org.springframework.stereotype.Repository;
 
@@ -11,6 +11,6 @@ import org.springframework.stereotype.Repository;
  *
  * @author itcast
  */
-public interface MqMessageMapper extends BaseMapper<MqMessageDTO> {
+public interface MqMessageMapper extends BaseMapper<MqMessage> {
 
 }
