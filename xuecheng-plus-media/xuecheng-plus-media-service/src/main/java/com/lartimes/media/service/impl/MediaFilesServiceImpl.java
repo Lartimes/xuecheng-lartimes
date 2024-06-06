@@ -10,10 +10,12 @@ import com.lartimes.content.model.PageParams;
 import com.lartimes.content.model.PageResult;
 import com.lartimes.content.model.RestResponse;
 import com.lartimes.media.mapper.MediaFilesMapper;
+import com.lartimes.media.mapper.MediaProcessMapper;
 import com.lartimes.media.model.dto.MediaFilesDTO;
 import com.lartimes.media.model.dto.UploadFileParamsDto;
 import com.lartimes.media.model.dto.UploadFileResultDto;
 import com.lartimes.media.model.po.MediaFiles;
+import com.lartimes.media.model.po.MediaProcess;
 import com.lartimes.media.service.MediaFilesService;
 import io.minio.*;
 import io.minio.errors.*;
@@ -55,6 +57,7 @@ public class MediaFilesServiceImpl extends ServiceImpl<MediaFilesMapper, MediaFi
 
     private final MinioClient minioClient;
     private final MediaFilesMapper mediaFilesMapper;
+    private final MediaProcessMapper mediaProcessMapper;
     @Value("${minio.bucket.videofiles}")
     String bucket_videofiles;
     private MediaFilesService currentProxy;
@@ -62,9 +65,10 @@ public class MediaFilesServiceImpl extends ServiceImpl<MediaFilesMapper, MediaFi
     @Value("${minio.bucket.files}")
     private String bucket_Files;
 
-    public MediaFilesServiceImpl(MediaFilesMapper mediaFilesMapper, MinioClient minioClient) {
+    public MediaFilesServiceImpl(MediaFilesMapper mediaFilesMapper, MinioClient minioClient, MediaProcessMapper mediaProcessMapper) {
         this.mediaFilesMapper = mediaFilesMapper;
         this.minioClient = minioClient;
+        this.mediaProcessMapper = mediaProcessMapper;
     }
 
     @Autowired
@@ -93,6 +97,7 @@ public class MediaFilesServiceImpl extends ServiceImpl<MediaFilesMapper, MediaFi
         return uploadFileResultDto;
     }
 
+    @Override
     public void addMediaFilesToMinIO(String localFilePath, String mimeType, String bucket, String objectName) {
         try {
             UploadObjectArgs build = UploadObjectArgs.builder().bucket(bucket).object(objectName).filename(localFilePath).contentType(mimeType).build();
@@ -100,7 +105,6 @@ public class MediaFilesServiceImpl extends ServiceImpl<MediaFilesMapper, MediaFi
             log.debug("上传文件到minio成功,bucket:{},objectName:{}", bucket, objectName);
         } catch (Exception e) {
             e.printStackTrace();
-            System.out.println(e.getMessage());
             log.error("上传文件到minio出错,bucket:{},objectName:{},错误原因:{}", bucket, objectName, e.getMessage(), e);
             XueChengPlusException.cast("上传文件到文件系统失败");
         }
@@ -132,7 +136,32 @@ public class MediaFilesServiceImpl extends ServiceImpl<MediaFilesMapper, MediaFi
             XueChengPlusException.cast("保存文件信息失败");
         }
         log.debug("保存文件信息到数据库成功,{}", mediaFiles);
+        //添加到待处理任务表
+        addWaitingTask(mediaFiles);
+        log.debug("保存文件信息到数据库成功,{}", mediaFiles);
+
         return mediaFiles;
+    }
+
+    /**
+     * 添加待处理任务
+     *
+     * @param mediaFiles
+     */
+    private void addWaitingTask(MediaFiles mediaFiles) {
+        //文件名称
+        String filename = mediaFiles.getFilename();
+        //文件扩展名
+        String exension = filename.substring(filename.lastIndexOf("."));
+        //文件mimeType
+        String mimeType = getMimeType(exension);
+        //如果是avi视频添加到视频待处理表
+        if ("video/x-msvideo".equals(mimeType)) {
+            MediaProcess mediaProcess = new MediaProcess();
+            BeanUtils.copyProperties(mediaFiles, mediaProcess);
+            mediaProcess.setStatus("1");//未处理
+            mediaProcessMapper.insert(mediaProcess);
+        }
     }
 
     @SneakyThrows
@@ -191,12 +220,10 @@ public class MediaFilesServiceImpl extends ServiceImpl<MediaFilesMapper, MediaFi
         final String chunkFileFolderPath = getChunkFileFolderPath(fileMd5);
         String filename = uploadFileParamsDto.getFilename();
         final String extension = filename.substring(filename.indexOf("."));
-        final String objName = chunkFileFolderPath.substring(0, chunkFileFolderPath.length() - "/chunk/".length() )
-                +extension;
+        final String objName = chunkFileFolderPath.substring(0, chunkFileFolderPath.length() - "/chunk/".length()) + extension;
 //        /chunk/
         List<ComposeSource> sources = Stream.iterate(0, i -> ++i).limit(chunkTotal).map(i -> ComposeSource.builder().bucket(bucket_videofiles).object(chunkFileFolderPath.concat(Integer.toString(i))).build()).collect(Collectors.toList());
-        ComposeObjectArgs composeObjectArgs = ComposeObjectArgs.builder().bucket(bucket_videofiles).object(objName)
-                        .sources(sources).build();
+        ComposeObjectArgs composeObjectArgs = ComposeObjectArgs.builder().bucket(bucket_videofiles).object(objName).sources(sources).build();
         try {
             minioClient.composeObject(composeObjectArgs);
         } catch (ErrorResponseException | InsufficientDataException | InternalException | InvalidKeyException |
@@ -255,11 +282,11 @@ public class MediaFilesServiceImpl extends ServiceImpl<MediaFilesMapper, MediaFi
         });
     }
 
+    @Override
     @SneakyThrows
-    private File downloadFromMinIo(String bucket, String objName) {
+    public File downloadFromMinIo(String bucket, String objName) {
         File minioFile = File.createTempFile("minio", ".merge");
-        try (FileOutputStream outputStream = new FileOutputStream(minioFile); InputStream input = minioClient
-                .getObject(GetObjectArgs.builder().bucket(bucket).object(objName).build())) {
+        try (FileOutputStream outputStream = new FileOutputStream(minioFile); InputStream input = minioClient.getObject(GetObjectArgs.builder().bucket(bucket).object(objName).build())) {
             IOUtils.copy(input, outputStream);
         }
         return minioFile;

@@ -1,25 +1,31 @@
 package com.lartimes.media.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.lartimes.media.mapper.MediaFilesMapper;
+import com.lartimes.media.mapper.MediaProcessHistoryMapper;
 import com.lartimes.media.mapper.MediaProcessMapper;
+import com.lartimes.media.model.po.MediaFiles;
 import com.lartimes.media.model.po.MediaProcess;
+import com.lartimes.media.model.po.MediaProcessHistory;
 import com.lartimes.media.service.MediaProcessService;
 import io.minio.GetObjectArgs;
 import io.minio.MinioClient;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.compress.utils.IOUtils;
+import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.InputStream;
+import java.time.LocalDateTime;
+import java.util.List;
 
 /**
  * <p>
- *  服务实现类
+ * 服务实现类
  * </p>
  *
  * @author itcast
@@ -28,62 +34,78 @@ import java.io.InputStream;
 @Service
 public class MediaProcessServiceImpl extends ServiceImpl<MediaProcessMapper, MediaProcess> implements MediaProcessService {
 
-
+    private final MediaFilesMapper mediaFilesMapper;
     private final MediaProcessMapper mediaProcessMapper;
+    private final MinioClient minioClient;
 
-    public MediaProcessServiceImpl(MediaProcessMapper mediaProcessMapper, MinioClient minioClient) {
+    private final MediaProcessHistoryMapper mediaProcessHistoryMapper;
+
+
+    public MediaProcessServiceImpl(MediaProcessMapper mediaProcessMapper, MinioClient minioClient, MediaFilesMapper mediaFilesMapper, MediaProcessHistoryMapper mediaProcessHistoryMapper) {
         this.mediaProcessMapper = mediaProcessMapper;
         this.minioClient = minioClient;
+        this.mediaFilesMapper = mediaFilesMapper;
+        this.mediaProcessHistoryMapper = mediaProcessHistoryMapper;
     }
 
-    /**
-     * 查询待处理的mediaProcess
-     * @param shardTotal
-     */
-    @Override
-    public void castVideoFile(int shardTotal , int shardIndex) {
-        Page<MediaProcess> mediaProcessPage = mediaProcessMapper.selectPage(new Page<>(0, shardTotal),
-                new LambdaQueryWrapper<MediaProcess>()
-                        .eq(true, MediaProcess::getStatus, "1"));
-        MediaProcess mediaProcess = mediaProcessPage.getRecords().stream().filter(
-                (record) -> record.getId() % shardTotal == shardIndex).findFirst().orElse(null);
-        if(mediaProcess != null){
-            try {
-                mediaProcess.setStatus("2");
-                mediaProcessMapper.updateById(mediaProcess);
-                File file = downLoadVideo(mediaProcess);
-//                进行格式转换，
-//                TODO 明天写
-//                Mp4VideoUtil videoUtil = new Mp4VideoUtil(null , video_path,mp4_name,mp4_path);
-//                开始视频转换，成功将返回success
-//                String s = videoUtil.generateMp4();
-//                System.out.println(s);
-//                进行上传
-
-//                更新记录
-                log.debug("处理成功");
-            }catch (Exception e){
-                mediaProcess.setStatus("3");
-                mediaProcess.setErrormsg(e.getMessage());
-                mediaProcessMapper.updateById(mediaProcess);
-                log.error("处理失败");
-            }
-
-        }
-    }
-
-
-    private final MinioClient minioClient;
     @SneakyThrows
     private File downLoadVideo(MediaProcess mediaProcess) {
         String bucket = mediaProcess.getBucket();
         String filePath = mediaProcess.getFilePath();
         String filename = mediaProcess.getFilename();
         File minioFile = File.createTempFile("minio", filename.substring(filename.indexOf(".")));
-        try (FileOutputStream outputStream = new FileOutputStream(minioFile); InputStream input = minioClient
-                .getObject(GetObjectArgs.builder().bucket(bucket).object(filePath).build())) {
+        try (FileOutputStream outputStream = new FileOutputStream(minioFile); InputStream input = minioClient.getObject(GetObjectArgs.builder().bucket(bucket).object(filePath).build())) {
             IOUtils.copy(input, outputStream);
         }
         return minioFile;
     }
+
+
+
+    @Override
+    public boolean startTask(Long id) {
+        int result = mediaProcessMapper.startTask(id);
+        return result == 1;
+    }
+
+    @Override
+    public void saveProcessFinishStatus(Long taskId, String status, String fileId, String url, String errorMsg) {
+        MediaProcess mediaProcess = mediaProcessMapper.selectById(taskId);
+        if (mediaProcess == null) {
+            return;
+        }
+        LambdaQueryWrapper<MediaProcess> mediaError = new LambdaQueryWrapper<MediaProcess>().eq(MediaProcess::getId, taskId);
+        mediaProcess.setFinishDate(LocalDateTime.now());
+        if("3".equals(status)){
+            mediaProcess.setFailCount(mediaProcess.getFailCount()+1);
+            mediaProcess.setErrormsg(errorMsg);
+            mediaProcessMapper.update(mediaProcess, mediaError);
+            log.debug("更新任务处理状态为失败，任务信息:{}",mediaProcess);
+            return;
+        }
+//         String fileId, String url
+        MediaFiles mediaFiles = mediaFilesMapper.selectById(fileId);
+        if(mediaFiles != null){
+            mediaFiles.setUrl(url);
+            mediaFiles.setChangeDate(LocalDateTime.now());
+            mediaFilesMapper.updateById(mediaFiles);
+            return;
+        }
+        mediaProcess.setStatus("2");
+        mediaProcess.setUrl(url);
+        mediaProcessMapper.updateById(mediaProcess);
+
+        MediaProcessHistory mediaProcessHistory = new MediaProcessHistory();
+        BeanUtils.copyProperties(mediaProcess , mediaProcessHistory);
+        mediaProcessHistoryMapper.insert(mediaProcessHistory);
+        //删除mediaProcess
+        mediaProcessMapper.deleteById(mediaProcess.getId());
+    }
+
+    @Override
+    public List<MediaProcess> getMediaProcessList(int shardIndex, int shardTotal , int count ) {
+        return mediaProcessMapper.getToResolvedMediaFiles(shardIndex, shardTotal , count);
+    }
+
+
 }

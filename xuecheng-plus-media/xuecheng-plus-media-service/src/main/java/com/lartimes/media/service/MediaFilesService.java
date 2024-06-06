@@ -9,6 +9,8 @@ import com.lartimes.media.model.dto.UploadFileParamsDto;
 import com.lartimes.media.model.dto.UploadFileResultDto;
 import com.lartimes.media.model.po.MediaFiles;
 
+import java.io.File;
+
 /**
  * <p>
  * 媒资信息 服务类
@@ -31,5 +33,8 @@ public interface MediaFilesService extends IService<MediaFiles> {
 
 
     PageResult<MediaFiles> getMediasByPage(PageParams params, MediaFilesDTO mediaFilesDTO);
+
+    File downloadFromMinIo(String bucket, String filePath);
+    public void addMediaFilesToMinIO(String localFilePath, String mimeType, String bucket, String objectName) ;
 
 }

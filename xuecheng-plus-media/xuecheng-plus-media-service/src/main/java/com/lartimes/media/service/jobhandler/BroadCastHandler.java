@@ -37,7 +37,6 @@ public class BroadCastHandler {
         for (int i = 0; i < shardTotal; i++) {
             if (i == shardIndex) {
                 XxlJobHelper.log("第 {} 片, 命中分片开始处理", i);
-                mediaProcessService.castVideoFile(shardTotal , shardIndex);
             } else {
                 XxlJobHelper.log("第 {} 片, 忽略", i);
             }

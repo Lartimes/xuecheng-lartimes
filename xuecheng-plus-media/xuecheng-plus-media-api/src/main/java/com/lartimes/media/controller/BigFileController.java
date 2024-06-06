@@ -5,6 +5,7 @@ import com.lartimes.media.model.dto.UploadFileParamsDto;
 import com.lartimes.media.service.MediaFilesService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -42,9 +43,10 @@ public class BigFileController {
 
     @Operation(summary = "上传分块文件")
     @PostMapping("/upload/uploadchunk")
-    public RestResponse<Boolean> uploadChunk(@RequestParam("file") MultipartFile file, @RequestParam("fileMd5") String fileMd5, @RequestParam("chunk") int chunk) throws Exception {
-        String originalFilename = file.getOriginalFilename();
-        System.out.println(originalFilename);
+    public RestResponse<Boolean> uploadChunk(@RequestParam("file") MultipartFile file, @RequestParam("fileMd5") String fileMd5,
+                                             @RequestParam("chunk") int chunk ,
+                                             HttpServletRequest request) throws Exception {
+
         return mediaFilesService.uploadChunk(fileMd5, chunk, file.getBytes());
     }
 
