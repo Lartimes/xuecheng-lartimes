@@ -12,7 +12,7 @@ import java.util.List;
 /**
  * @author Lartimes
  * @version 1.0
- * @description:
+ * @description: 分页查询返回对象
  * @since 2024/2/5 21:43
  */
 @Data

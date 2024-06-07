@@ -1,12 +1,16 @@
 package com.lartimes.content.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.lartimes.content.exception.XueChengPlusException;
 import com.lartimes.content.mapper.CourseTeacherMapper;
 import com.lartimes.content.mapper.TeachplanMapper;
+import com.lartimes.content.mapper.TeachplanMediaMapper;
 import com.lartimes.content.model.dto.SaveTeachPlanDto;
+import com.lartimes.content.model.dto.TeachPlanMediaDto;
 import com.lartimes.content.model.dto.TeachPlanTreeDto;
 import com.lartimes.content.model.po.CourseTeacher;
 import com.lartimes.content.model.po.Teachplan;
+import com.lartimes.content.model.po.TeachplanMedia;
 import com.lartimes.content.service.TeachPlanService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
@@ -32,10 +36,13 @@ public class TeachPlanServiceImpl implements TeachPlanService {
     private final TeachplanMapper teachplanMapper;
     private final CourseTeacherMapper teacherMapper;
 
+    private final TeachplanMediaMapper teachplanMediaMapper;
 
-    public TeachPlanServiceImpl(TeachplanMapper teachplanMapper, CourseTeacherMapper teacherMapper) {
+
+    public TeachPlanServiceImpl(TeachplanMapper teachplanMapper, CourseTeacherMapper teacherMapper, TeachplanMediaMapper teachplanMediaMapper) {
         this.teachplanMapper = teachplanMapper;
         this.teacherMapper = teacherMapper;
+        this.teachplanMediaMapper = teachplanMediaMapper;
     }
 
     /**
@@ -164,5 +171,38 @@ public class TeachPlanServiceImpl implements TeachPlanService {
         LambdaQueryWrapper<Teachplan> query = new LambdaQueryWrapper<>();
         query.eq(id != null , Teachplan::getCourseId , id);
         teachplanMapper.delete(query);
+    }
+
+    @Transactional
+    @Override
+    public TeachplanMedia bindMediaPlan(TeachPlanMediaDto teachPlanMediaDto) {
+        Long teachPlanId = teachPlanMediaDto.getTeachplanId();
+        Teachplan teachplan = teachplanMapper.selectById(teachPlanId);
+        if(teachplan==null){
+            XueChengPlusException.cast("教学计划不存在");
+        }
+        Integer grade = teachplan.getGrade();
+        if(grade<2){
+            XueChengPlusException.cast("只允许第二级以下绑定视频");
+        }
+        //先删除原来该教学计划绑定的媒资
+        teachplanMediaMapper.delete(new LambdaQueryWrapper<TeachplanMedia>().eq(TeachplanMedia::getTeachplanId,teachPlanId));
+
+        TeachplanMedia teachplanMedia = new TeachplanMedia();
+        teachplanMedia.setMediaId(teachPlanMediaDto.getMediaId());
+        teachplanMedia.setCourseId(teachplan.getCourseId());
+        teachplanMedia.setCreateDate(LocalDateTime.now());
+        teachplanMedia.setTeachplanId(teachPlanMediaDto.getTeachplanId());
+        teachplanMedia.setMediaFilename(teachPlanMediaDto.getFileName());
+        teachplanMediaMapper.insert(teachplanMedia);
+        return teachplanMedia;
+    }
+
+    @Transactional
+    @Override
+    public void unbindMediaPlan(Integer planId, String mediaId) {
+        teachplanMediaMapper.delete(new LambdaQueryWrapper<TeachplanMedia>().eq(planId != null,
+                        TeachplanMedia::getTeachplanId, planId)
+                .eq(TeachplanMedia::getMediaId, mediaId));
     }
 }

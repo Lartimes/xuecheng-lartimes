@@ -8,6 +8,9 @@ import com.lartimes.media.model.dto.UploadFileResultDto;
 import com.lartimes.media.model.po.MediaFiles;
 import com.lartimes.media.service.MediaFilesService;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.Parameters;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
@@ -25,6 +28,7 @@ import java.io.IOException;
  */
 @Slf4j
 @RestController
+@Tag(name = "MediaFilesController", description = "mediaFilesController")
 public class MediaFilesController {
 
     private final MediaFilesService mediaFilesService;
@@ -36,13 +40,20 @@ public class MediaFilesController {
 
     @Operation(summary = "分页查询medias")
     @PostMapping("/files")
-    public PageResult<MediaFiles> pageMedias(PageParams params, @RequestBody(required = false) MediaFilesDTO mediaFilesDTO) {
-        return mediaFilesService.getMediasByPage(params , mediaFilesDTO);
+    @Parameters({@Parameter(name = "params", description = "分页参数")
+            , @Parameter(name = "mediaFilesDTO", description = "对媒资模糊查询参数")})
+    public PageResult<MediaFiles> pageMedias( PageParams params, @RequestBody(required = false) MediaFilesDTO mediaFilesDTO) {
+        return mediaFilesService.getMediasByPage(params, mediaFilesDTO);
     }
 
     @Operation(summary = "上传图片")
     @PostMapping(value = "/upload/coursefile", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public UploadFileResultDto uploadPictures(@RequestPart("filedata") MultipartFile upload, @RequestParam(value = "folder", required = false) String folder, @RequestParam(value = "objectName", required = false) String objectName) throws IOException {
+    @Parameters({@Parameter(name = "filedata", description = "上传文件") ,
+            @Parameter(name = "folder", description = "")
+            , @Parameter(name = "objectName", description = "上传到Minio的路径")})
+    public UploadFileResultDto uploadPictures(@RequestPart("filedata") MultipartFile upload,
+                                              @RequestParam(value = "folder", required = false) String folder,
+                                              @RequestParam(value = "objectName", required = false) String objectName) throws IOException {
         String originalFilename = upload.getOriginalFilename();
         long size = upload.getSize();
         UploadFileParamsDto uploadFileParamsDto = new UploadFileParamsDto();

@@ -34,33 +34,50 @@ public class CourseBaseInfoController {
 
     @Operation(summary = "查询课程")
     @GetMapping("/course/{id}")
+    @Parameters(
+            @Parameter(name = "id" ,description = "课程ID")
+    )
     public CourseBaseInfoDto getCourse(@PathVariable("id") String id) {
         return courseBaseInfoService.selectCourseById(id);
     }
 
     @Operation(summary = "修改课程")
     @PutMapping("/course")
-    public CourseBaseInfoDto editCourse(@Validated @RequestBody EditCourseDto editCourseDto) {
+    @Parameters(
+            @Parameter(name = "EditCourseDto" ,description = "修改课程DTO")
+    )
+    public CourseBaseInfoDto editCourse(@Validated @RequestBody
+                                            EditCourseDto editCourseDto) {
         Long companyId = 1232141425L;
         return courseBaseInfoService.updateCourse(companyId, editCourseDto);
     }
 
     @Operation(summary = "新增课程")
     @PostMapping("/course")
-    public CourseBaseInfoDto addCourse(@Validated @RequestBody AddCourseInfoDto courseInfoDto) {
+    @Parameters(
+            @Parameter(name = "AddCourseInfoDto" ,description = "新增课程Info")
+    )
+    public CourseBaseInfoDto addCourse(@Validated @RequestBody
+                                           AddCourseInfoDto courseInfoDto) {
         return courseBaseInfoService.addCourse(courseInfoDto);
     }
 
     @Operation(summary = "删除课程")
     @DeleteMapping("/course/{id}")
+    @Parameters(
+            @Parameter(name = "id" ,description = "课程ID")
+    )
     public void deleteCourse(@PathVariable("id") Long id ){
         courseBaseInfoService.deleteCourse(id);
     }
 
     @Operation(summary = "查询接口", description = "对内容进行分页查询")
     @PostMapping("/course/list")
-    @Parameters({@Parameter(name = "QueryCourseParamsDto")})
-    public PageResult<CourseBase> toDo(PageParams params, @RequestBody(required = false) QueryCourseParamsDto courseParamsDto) {
+    @Parameters({@Parameter(name = "params" , description = "分页参数"),
+            @Parameter(name = "QueryCourseParamsDto", description = "查询课程其他筛选参数")})
+    public PageResult<CourseBase> toDo(PageParams params,
+                                       @RequestBody(required = false)
+                                       QueryCourseParamsDto courseParamsDto) {
         return courseBaseInfoService.getContentsByPage(params, courseParamsDto);
     }
 }

@@ -8,6 +8,9 @@ import org.springframework.context.annotation.Configuration;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
+/**
+ * 实现全局时间格式化
+ */
 @Configuration
 public class LocalDateTimeConfig {
 

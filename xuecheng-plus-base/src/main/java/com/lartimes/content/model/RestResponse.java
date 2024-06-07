@@ -9,7 +9,6 @@ import lombok.ToString;
  * @date 2022/9/13 14:44
  * @version 1.0
  */
-
  @Data
  @ToString
 public class RestResponse<T> {

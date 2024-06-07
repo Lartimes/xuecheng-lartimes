@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 
@@ -19,6 +20,7 @@ import java.time.LocalDateTime;
 @TableName("course_publish_pre")
 public class CoursePublishPre implements Serializable {
 
+    @Serial
     private static final long serialVersionUID = 1L;
 
     /**

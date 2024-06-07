@@ -8,7 +8,7 @@ import lombok.NoArgsConstructor;
 /**
  * @author Lartimes
  * @version 1.0
- * @description:
+ * @description: 分页参数包装类
  * @since 2024/2/5 21:41
  */
 @Data

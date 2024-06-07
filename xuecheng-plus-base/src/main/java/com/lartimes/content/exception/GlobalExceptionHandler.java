@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 /**
  * @author Lartimes
  * @version 1.0
- * @description:
+ * @description: 全局异常
  * @since 2024/2/8 10:36
  */
 
@@ -44,9 +44,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(Exception.class)
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public RestErrorResponse exception(Exception e) {
-
         log.error("【系统异常】{}", e.getMessage(), e);
-
         return new RestErrorResponse(CommonError.UNKOWN_ERROR.getErrMessage());
 
     }

@@ -1,4 +1,4 @@
-package com.lartimes.content.config;
+package com.lartimes.media.config;
 
 import io.swagger.v3.oas.models.ExternalDocumentation;
 import io.swagger.v3.oas.models.OpenAPI;
@@ -21,8 +21,8 @@ public class SpringDocConfig {
     @Bean
     public OpenAPI springShopOpenAPI() {
         return new OpenAPI()
-                .info(new Info().title("学成在线内容管理系统")
-                        .description("内容系统管理系统对课程相关信息进行管理")
+                .info(new Info().title("学成在线媒资管理系统")
+                        .description("媒资管理")
                         .version("v0.0.1")
                         .license(new License().name("Apache 2.0").url("https://github.com/macrozheng/mall-learning")))
                         .externalDocs(new ExternalDocumentation()

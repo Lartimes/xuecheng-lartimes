@@ -5,6 +5,10 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * 处理Avi格式--> Mp4
+ * @author Lartimes
+ */
 public class Mp4VideoUtil extends VideoUtil {
 
     String ffmpeg_path = System.getenv("ffmpeg_home").replaceAll("\\\\" ,"/")
@@ -12,8 +16,8 @@ public class Mp4VideoUtil extends VideoUtil {
     String video_path = "D:\\BaiduNetdiskDownload\\test1.avi";
     String mp4_name = "test1.mp4";
     String mp4folder_path = "D:/BaiduNetdiskDownload/Movies/test1/";
-    public Mp4VideoUtil(String ffmpeg_path, String video_path, String mp4_name, String mp4folder_path){
-        super(ffmpeg_path);
+    public Mp4VideoUtil(String ffmpegPath, String video_path, String mp4_name, String mp4folder_path){
+        super(ffmpegPath);
         this.video_path = video_path;
         this.mp4_name = mp4_name;
         this.mp4folder_path = mp4folder_path;
@@ -68,9 +72,7 @@ public class Mp4VideoUtil extends VideoUtil {
             outstring = waitFor(p);
 
         } catch (Exception ex) {
-
             ex.printStackTrace();
-
         }
 //        Boolean check_video_time = this.check_video_time(video_path, mp4folder_path + mp4_name);
         Boolean check_video_time = this.check_video_time(video_path, mp4folder_path);
